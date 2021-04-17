@@ -19,14 +19,14 @@ public class GenerationManager : MonoBehaviour
     [Header("Parenting and Mutation")]
     [SerializeField]
     private float mutationFactor;
-    [SerializeField] 
+    [SerializeField]
     private float mutationChance;
-    [SerializeField] 
+    [SerializeField]
     private int boatParentSize;
-    [SerializeField] 
+    [SerializeField]
     private int pirateParentSize;
 
-    [Space(10)] 
+    [Space(10)]
     [Header("Simulation Controls")]
     [SerializeField, Tooltip("Time per simulation (in seconds).")]
     private float simulationTimer;
@@ -37,11 +37,11 @@ public class GenerationManager : MonoBehaviour
     [SerializeField, Tooltip("Initial count for the simulation. Used for the Prefabs naming.")]
     private int generationCount;
 
-    [Space(10)] 
+    [Space(10)]
     [Header("Prefab Saving")]
     [SerializeField]
     private string savePrefabsAt;
-    
+
     /// <summary>
     /// Those variables are used mostly for debugging in the inspector.
     /// </summary>
@@ -56,15 +56,18 @@ public class GenerationManager : MonoBehaviour
     private List<PirateLogic> _activePirates;
     private BoatLogic[] _boatParents;
     private PirateLogic[] _pirateParents;
-    
+
     private void Start()
     {
         if (runOnStart)
         {
             StartSimulation();
+
+            DataCollector dataCollector = new DataCollector();
+            dataCollector.writeFile(Application.dataPath + "test.txt");
         }
     }
-    
+
     private void Update()
     {
         if (_runningSimulation)
@@ -75,12 +78,12 @@ public class GenerationManager : MonoBehaviour
                 ++generationCount;
                 MakeNewGeneration();
                 simulationCount = -Time.deltaTime;
-            } 
+            }
             simulationCount += Time.deltaTime;
         }
     }
 
-     
+
     /// <summary>
     /// Generates the boxes on all box areas.
     /// </summary>
@@ -91,26 +94,26 @@ public class GenerationManager : MonoBehaviour
             generateObjectsInArea.RegenerateObjects();
         }
     }
-    
-     /// <summary>
-     /// Generates boats and pirates using the parents list.
-     /// If no parents are used, then they are ignored and the boats/pirates are generated using the default prefab
-     /// specified in their areas.
-     /// </summary>
-     /// <param name="boatParents"></param>
-     /// <param name="pirateParents"></param>
+
+    /// <summary>
+    /// Generates boats and pirates using the parents list.
+    /// If no parents are used, then they are ignored and the boats/pirates are generated using the default prefab
+    /// specified in their areas.
+    /// </summary>
+    /// <param name="boatParents"></param>
+    /// <param name="pirateParents"></param>
     public void GenerateObjects(BoatLogic[] boatParents = null, PirateLogic[] pirateParents = null)
     {
         GenerateBoats(boatParents);
         GeneratePirates(pirateParents);
     }
 
-     /// <summary>
-     /// Generates the list of pirates using the parents list. The parent list can be null and, if so, it will be ignored.
-     /// Newly created pirates will go under mutation (MutationChances and MutationFactor will be applied).
-     /// Newly create agents will be Awaken (calling AwakeUp()).
-     /// </summary>
-     /// <param name="pirateParents"></param>
+    /// <summary>
+    /// Generates the list of pirates using the parents list. The parent list can be null and, if so, it will be ignored.
+    /// Newly created pirates will go under mutation (MutationChances and MutationFactor will be applied).
+    /// Newly create agents will be Awaken (calling AwakeUp()).
+    /// </summary>
+    /// <param name="pirateParents"></param>
     private void GeneratePirates(PirateLogic[] pirateParents)
     {
         _activePirates = new List<PirateLogic>();
@@ -133,12 +136,12 @@ public class GenerationManager : MonoBehaviour
         }
     }
 
-     /// <summary>
-     /// Generates the list of boats using the parents list. The parent list can be null and, if so, it will be ignored.
-     /// Newly created boats will go under mutation (MutationChances and MutationFactor will be applied).
-     /// /// Newly create agents will be Awaken (calling AwakeUp()).
-     /// </summary>
-     /// <param name="boatParents"></param>
+    /// <summary>
+    /// Generates the list of boats using the parents list. The parent list can be null and, if so, it will be ignored.
+    /// Newly created boats will go under mutation (MutationChances and MutationFactor will be applied).
+    /// /// Newly create agents will be Awaken (calling AwakeUp()).
+    /// </summary>
+    /// <param name="boatParents"></param>
     private void GenerateBoats(BoatLogic[] boatParents)
     {
         _activeBoats = new List<BoatLogic>();
@@ -159,18 +162,27 @@ public class GenerationManager : MonoBehaviour
                 boat.AwakeUp();
             }
         }
+
+        //foreach (GameObject obj in boatsPrefabs)
+        //{
+        //    BoatLogic boat = obj.GetComponent<BoatLogic>();
+
+        //    _activeBoats.Add(boat);
+
+        //    boat.AwakeUp();
+        //}
     }
 
-     /// <summary>
-     /// Creates a new generation by using GenerateBoxes and GenerateBoats/Pirates.
-     /// Previous generations will be removed and the best parents will be selected and used to create the new generation.
-     /// The best parents (top 1) of the generation will be stored as a Prefab in the [savePrefabsAt] folder. Their name
-     /// will use the [generationCount] as an identifier.
-     /// </summary>
+    /// <summary>
+    /// Creates a new generation by using GenerateBoxes and GenerateBoats/Pirates.
+    /// Previous generations will be removed and the best parents will be selected and used to create the new generation.
+    /// The best parents (top 1) of the generation will be stored as a Prefab in the [savePrefabsAt] folder. Their name
+    /// will use the [generationCount] as an identifier.
+    /// </summary>
     public void MakeNewGeneration()
     {
         GenerateBoxes();
-        
+
         //Fetch parents
         _activeBoats.RemoveAll(item => item == null);
         _activeBoats.Sort();
@@ -185,10 +197,10 @@ public class GenerationManager : MonoBehaviour
         }
 
         BoatLogic lastBoatWinner = _activeBoats[0];
-        lastBoatWinner.name += "Gen-" + generationCount; 
+        lastBoatWinner.name += "Gen-" + generationCount;
         lastBoatWinnerData = lastBoatWinner.GetData();
         PrefabUtility.SaveAsPrefabAsset(lastBoatWinner.gameObject, savePrefabsAt + lastBoatWinner.name + ".prefab");
-        
+
         _activePirates.RemoveAll(item => item == null);
         _activePirates.Sort();
         _pirateParents = new PirateLogic[pirateParentSize];
@@ -198,20 +210,20 @@ public class GenerationManager : MonoBehaviour
         }
 
         PirateLogic lastPirateWinner = _activePirates[0];
-        lastPirateWinner.name += "Gen-" + generationCount; 
+        lastPirateWinner.name += "Gen-" + generationCount;
         lastPirateWinnerData = lastPirateWinner.GetData();
         PrefabUtility.SaveAsPrefabAsset(lastPirateWinner.gameObject, savePrefabsAt + lastPirateWinner.name + ".prefab");
-        
+
         //Winners:
         Debug.Log("Last winner boat had: " + lastBoatWinner.GetPoints() + " points!" + " Last winner pirate had: " + lastPirateWinner.GetPoints() + " points!");
-        
+
         GenerateObjects(_boatParents, _pirateParents);
     }
 
-     /// <summary>
-     /// Starts a new simulation. It does not call MakeNewGeneration. It calls both GenerateBoxes and GenerateObjects and
-     /// then sets the _runningSimulation flag to true.
-     /// </summary>
+    /// <summary>
+    /// Starts a new simulation. It does not call MakeNewGeneration. It calls both GenerateBoxes and GenerateObjects and
+    /// then sets the _runningSimulation flag to true.
+    /// </summary>
     public void StartSimulation()
     {
         GenerateBoxes();
@@ -219,20 +231,20 @@ public class GenerationManager : MonoBehaviour
         _runningSimulation = true;
     }
 
-     /// <summary>
-     /// Continues the simulation. It calls MakeNewGeneration to use the previous state of the simulation and continue it.
-     /// It sets the _runningSimulation flag to true.
-     /// </summary>
-     public void ContinueSimulation()
-     {
-         MakeNewGeneration();
-         _runningSimulation = true;
-     }
-     
-     /// <summary>
-     /// Stops the count for the simulation. It also removes null (Destroyed) boats from the _activeBoats list and sets
-     /// all boats and pirates to Sleep.
-     /// </summary>
+    /// <summary>
+    /// Continues the simulation. It calls MakeNewGeneration to use the previous state of the simulation and continue it.
+    /// It sets the _runningSimulation flag to true.
+    /// </summary>
+    public void ContinueSimulation()
+    {
+        MakeNewGeneration();
+        _runningSimulation = true;
+    }
+
+    /// <summary>
+    /// Stops the count for the simulation. It also removes null (Destroyed) boats from the _activeBoats list and sets
+    /// all boats and pirates to Sleep.
+    /// </summary>
     public void StopSimulation()
     {
         _runningSimulation = false;
