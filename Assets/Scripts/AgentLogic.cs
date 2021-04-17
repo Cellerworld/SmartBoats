@@ -114,6 +114,11 @@ public class AgentLogic : MonoBehaviour, IComparable
     private float enemyDistanceFactor;
 
     [Space(10)]
+    [SerializeField]
+    static float shapeParameter = 2;
+    int maxGeneration = 500;
+
+    [Space(10)]
     [Header("Debug & Help")]
     [SerializeField]
     private Color visionColor;
@@ -123,6 +128,9 @@ public class AgentLogic : MonoBehaviour, IComparable
     private Color directionColor;
     [SerializeField, Tooltip("Shows visualization rays.")]
     private bool debug;
+
+    System.Random r1Generator = new System.Random(5);
+    System.Random r2Generator = new System.Random(2);
 
     #region Static Variables
     private static float _minimalSteps = 1.0f;
@@ -244,81 +252,62 @@ public class AgentLogic : MonoBehaviour, IComparable
 
     public void mutateNonUniform(int pGeneration)
     {
-        System.Random r1 = new System.Random();
-        System.Random r2 = new System.Random(2);
 
-        //if (Random.Range(0.0f, 100.0f) <= mutationChance)
-        //{
-        //    steps += (int)Random.Range(-mutationFactor, +mutationFactor);
-        //    steps = (int)Mathf.Max(steps, _minimalSteps);
-        //}
-        //if (Random.Range(0.0f, 100.0f) <= mutationChance)
-        //{
-        //    rayRadius += (int)Random.Range(-mutationFactor, +mutationFactor);
-        //    rayRadius = (int)Mathf.Max(rayRadius, _minimalRayRadius);
-        //}
-        //if (Random.Range(0.0f, 100.0f) <= mutationChance)
-        //{
-        //    float sightIncrease = Random.Range(-mutationFactor, +mutationFactor);
-        //    sight += sightIncrease;
-        //    sight = Mathf.Max(sight, _minimalSight);
-        //    if (sightIncrease > 0.0f)
-        //    {
-        //        movingSpeed -= sightIncrease * _sightInfluenceInSpeed;
-        //        movingSpeed = Mathf.Max(movingSpeed, _minimalMovingSpeed);
-        //    }
-        //}
-        //if (Random.Range(0.0f, 100.0f) <= mutationChance)
-        //{
-        //    float movingSpeedIncrease = Random.Range(-mutationFactor, +mutationFactor);
-        //    movingSpeed += movingSpeedIncrease;
-        //    movingSpeed = Mathf.Max(movingSpeed, _minimalMovingSpeed);
-        //    if (movingSpeedIncrease > 0.0f)
-        //    {
-        //        sight -= movingSpeedIncrease * _speedInfluenceInSight;
-        //        sight = Mathf.Max(sight, _minimalSight);
-        //    }
-        //}
-        //if (Random.Range(0.0f, 100.0f) <= mutationChance)
-        //{
-        //    randomDirectionValue.x += Random.Range(-mutationFactor, +mutationFactor);
-        //}
-        //if (Random.Range(0.0f, 100.0f) <= mutationChance)
-        //{
-        //    randomDirectionValue.y += Random.Range(-mutationFactor, +mutationFactor);
-        //}
-        //if (Random.Range(0.0f, 100.0f) <= mutationChance)
-        //{
-        //    boxWeight += Random.Range(-mutationFactor, +mutationFactor);
-        //}
-        //if (Random.Range(0.0f, 100.0f) <= mutationChance)
-        //{
-        //    distanceFactor += Random.Range(-mutationFactor, +mutationFactor);
-        //}
-        //if (Random.Range(0.0f, 100.0f) <= mutationChance)
-        //{
-        //    boatWeight += Random.Range(-mutationFactor, +mutationFactor);
-        //}
-        //if (Random.Range(0.0f, 100.0f) <= mutationChance)
-        //{
-        //    boatDistanceFactor += Random.Range(-mutationFactor, +mutationFactor);
-        //}
-        //if (Random.Range(0.0f, 100.0f) <= mutationChance)
-        //{
-        //    enemyWeight += Random.Range(-mutationFactor, +mutationFactor);
-        //}
-        //if (Random.Range(0.0f, 100.0f) <= mutationChance)
-        //{
-        //    enemyDistanceFactor += Random.Range(-mutationFactor, +mutationFactor);
-        //}
+        steps = (int)applyNonUnifromMutation(steps, 50, _minimalSteps, pGeneration);
+
+        rayRadius = (int)applyNonUnifromMutation(rayRadius, 360, _minimalRayRadius, pGeneration);
+
+        float newSight = applyNonUnifromMutation(sight, 100, _minimalSight, pGeneration);
+        //maybe change this
+        if (newSight - sight > 0)
+        {
+            movingSpeed -= (newSight - sight) * _sightInfluenceInSpeed;
+            movingSpeed = Mathf.Max(movingSpeed, _minimalMovingSpeed);
+        }
+        sight = newSight;
+
+        float newMovingSpeed = applyNonUnifromMutation(sight, 100, _minimalSight, pGeneration);
+        if (newMovingSpeed - movingSpeed > 0.0f)
+        {
+            sight -= (newMovingSpeed - movingSpeed) * _speedInfluenceInSight;
+            sight = Mathf.Max(sight, _minimalSight);
+        }
+        movingSpeed = newMovingSpeed;
+
+        randomDirectionValue.x = applyNonUnifromMutation(randomDirectionValue.x, 10, -10, pGeneration);
+        randomDirectionValue.y = applyNonUnifromMutation(randomDirectionValue.y, 10, -10, pGeneration);
+
+
+        boxWeight = applyNonUnifromMutation(boxWeight, 10, -10, pGeneration);
+
+        distanceFactor = applyNonUnifromMutation(distanceFactor, 10, -10, pGeneration);
+
+
+        boatWeight = applyNonUnifromMutation(boatWeight, 10, -10, pGeneration);
+
+        boatDistanceFactor = applyNonUnifromMutation(boatDistanceFactor, 10, -10, pGeneration);
+
+        enemyWeight = applyNonUnifromMutation(enemyWeight, 10, -10, pGeneration);
+
+        enemyDistanceFactor = applyNonUnifromMutation(enemyDistanceFactor, 10, -10, pGeneration);
     }
 
-    private void applyNonUnifromMutation(ref float parameter, int max, int min, int generation, int r1, int r2)
+    private float applyNonUnifromMutation(float parameter, float max, float min, float generation)
     {
-        int ShapeParameter = 2;
-        float functionResult = Mathf.Pow(r2 * (1.0f - (generation / 500.0f)), ShapeParameter);
+        float r1 = (float)r1Generator.NextDouble();
+        //next double implements a number between 0 and 1. Divided by 2 this can be a max of 0.5. We want r2 to be a minimum of 0.5 and a max of 1
+        float r2 = 1 - ((float)r2Generator.NextDouble() / 2);
 
-        parameter = parameter + ((max - parameter) * functionResult);
+        //F(G) = r2 (1- G/Gmax)^b
+        float functionResult = Mathf.Pow(r2 * (1.0f - (generation / 500.0f)), shapeParameter);
+        if (r1 < 0.5f)
+            //xi +(bi - xi) * F(G)
+            parameter = parameter + ((max - parameter) * functionResult);
+        else if (r1 >= 0.5f)
+            //xi -(ai + xi) * F(G)
+            parameter = parameter - ((min + parameter) * functionResult);
+
+        return parameter;
     }
 
     private void Update()

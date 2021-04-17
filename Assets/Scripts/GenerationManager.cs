@@ -57,14 +57,16 @@ public class GenerationManager : MonoBehaviour
     private BoatLogic[] _boatParents;
     private PirateLogic[] _pirateParents;
 
+    DataCollector dataCollector = new DataCollector();
+
+    [SerializeField]
+    string fileName = "/test.txt";
+
     private void Start()
     {
         if (runOnStart)
         {
             StartSimulation();
-
-            DataCollector dataCollector = new DataCollector();
-            dataCollector.writeFile(Application.dataPath + "test.txt");
         }
     }
 
@@ -76,6 +78,8 @@ public class GenerationManager : MonoBehaviour
             if (simulationCount >= simulationTimer)
             {
                 ++generationCount;
+                if (generationCount == 5)
+                    dataCollector.writeFile(Application.dataPath + "/Data" + fileName);
                 MakeNewGeneration();
                 simulationCount = -Time.deltaTime;
             }
@@ -118,6 +122,7 @@ public class GenerationManager : MonoBehaviour
     {
         _activePirates = new List<PirateLogic>();
         List<GameObject> objects = pirateGenerator.RegenerateObjects();
+        int i = 0;
         foreach (GameObject obj in objects)
         {
             PirateLogic pirate = obj.GetComponent<PirateLogic>();
@@ -126,12 +131,14 @@ public class GenerationManager : MonoBehaviour
                 _activePirates.Add(pirate);
                 if (pirateParents != null)
                 {
-                    PirateLogic pirateParent = pirateParents[Random.Range(0, pirateParents.Length)];
+                    PirateLogic pirateParent = pirateParents[i % pirateParentSize];
                     pirate.Birth(pirateParent.GetData());
                 }
 
-                pirate.Mutate(mutationFactor, mutationChance);
+                //pirate.Mutate(mutationFactor, mutationChance);
+                pirate.mutateNonUniform(generationCount);
                 pirate.AwakeUp();
+                i++;
             }
         }
     }
@@ -152,25 +159,16 @@ public class GenerationManager : MonoBehaviour
             if (boat != null)
             {
                 _activeBoats.Add(boat);
-                if (boatParents != null)
-                {
-                    BoatLogic boatParent = boatParents[Random.Range(0, boatParents.Length)];
-                    boat.Birth(boatParent.GetData());
-                }
+                //if (boatParents != null)
+                //{
+                //    BoatLogic boatParent = boatParents[Random.Range(0, boatParents.Length)];
+                //    //boat.Birth(boatParent.GetData());
+                //}
 
-                boat.Mutate(mutationFactor, mutationChance);
+                //boat.Mutate(mutationFactor, mutationChance);
                 boat.AwakeUp();
             }
         }
-
-        //foreach (GameObject obj in boatsPrefabs)
-        //{
-        //    BoatLogic boat = obj.GetComponent<BoatLogic>();
-
-        //    _activeBoats.Add(boat);
-
-        //    boat.AwakeUp();
-        //}
     }
 
     /// <summary>
@@ -204,12 +202,17 @@ public class GenerationManager : MonoBehaviour
         _activePirates.RemoveAll(item => item == null);
         _activePirates.Sort();
         _pirateParents = new PirateLogic[pirateParentSize];
+        float midPoints = 0;
         for (int i = 0; i < pirateParentSize; i++)
         {
+            midPoints += _activePirates[i].GetPoints();
             _pirateParents[i] = _activePirates[i];
         }
+        midPoints /= pirateParentSize;
 
         PirateLogic lastPirateWinner = _activePirates[0];
+        dataCollector.addData(lastPirateWinner.GetPoints(), _pirateParents[pirateParentSize - 1].GetPoints(), midPoints);
+
         lastPirateWinner.name += "Gen-" + generationCount;
         lastPirateWinnerData = lastPirateWinner.GetData();
         PrefabUtility.SaveAsPrefabAsset(lastPirateWinner.gameObject, savePrefabsAt + lastPirateWinner.name + ".prefab");
