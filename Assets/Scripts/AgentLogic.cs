@@ -129,8 +129,8 @@ public class AgentLogic : MonoBehaviour, IComparable
     [SerializeField, Tooltip("Shows visualization rays.")]
     private bool debug;
 
-    System.Random r1Generator = new System.Random(5);
-    System.Random r2Generator = new System.Random(2);
+    static System.Random r1Generator = new System.Random(5);
+    static System.Random r2Generator = new System.Random(2);
 
     #region Static Variables
     private static float _minimalSteps = 1.0f;
@@ -250,7 +250,7 @@ public class AgentLogic : MonoBehaviour, IComparable
         }
     }
 
-    public void mutateNonUniform(int pGeneration)
+    public void muultiNonUniformMutation(int pGeneration)
     {
 
         steps = (int)applyNonUnifromMutation(steps, 50, _minimalSteps, pGeneration);
@@ -296,10 +296,11 @@ public class AgentLogic : MonoBehaviour, IComparable
     {
         float r1 = (float)r1Generator.NextDouble();
         //next double implements a number between 0 and 1. Divided by 2 this can be a max of 0.5. We want r2 to be a minimum of 0.5 and a max of 1
-        float r2 = 1 - ((float)r2Generator.NextDouble() / 2);
+        float r2 = (float)r2Generator.NextDouble();// 1 - ((float)r2Generator.NextDouble() / 2);
 
         //F(G) = r2 (1- G/Gmax)^b
         float functionResult = Mathf.Pow(r2 * (1.0f - (generation / 500.0f)), shapeParameter);
+
         if (r1 < 0.5f)
             //xi +(bi - xi) * F(G)
             parameter = parameter + ((max - parameter) * functionResult);

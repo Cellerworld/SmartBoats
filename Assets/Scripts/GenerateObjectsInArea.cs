@@ -23,6 +23,8 @@ public class GenerateObjectsInArea : MonoBehaviour
     [SerializeField]
     private Vector3 randomRotationMaximal;
 
+    System.Random rGenerator = new System.Random(10);
+
     private void Awake()
     {
         _bounds = GetComponent<Renderer>().bounds;
@@ -38,7 +40,7 @@ public class GenerateObjectsInArea : MonoBehaviour
             DestroyImmediate(transform.GetChild(i).gameObject);
         }
     }
-    
+
     /// <summary>
     /// Destroy all objects in the area (that belongs to this script) and creates them again.
     /// The list of newly created objects is returned.
@@ -50,18 +52,19 @@ public class GenerateObjectsInArea : MonoBehaviour
         {
             DestroyImmediate(transform.GetChild(i).gameObject);
         }
-        
+
         List<GameObject> newObjects = new List<GameObject>();
         for (uint i = 0; i < count; i++)
         {
-            GameObject created = Instantiate(gameObjectToBeCreated[Random.Range(0, gameObjectToBeCreated.Length)], GetRandomPositionInWorldBounds(), GetRandomRotation());
+            //GameObject created = Instantiate(gameObjectToBeCreated[Random.Range(0, gameObjectToBeCreated.Length)], GetRandomPositionInWorldBounds(), GetRandomRotation());
+            GameObject created = Instantiate(gameObjectToBeCreated[Random.Range(0, gameObjectToBeCreated.Length)], GetDeterministicRandomPositionInWorldBounds(), GetRandomRotation());
             created.transform.parent = transform;
             newObjects.Add(created);
         }
 
         return newObjects;
     }
-    
+
     /// <summary>
     /// Gets a random position delimited by the bounds, using its extends and center.
     /// </summary>
@@ -76,7 +79,18 @@ public class GenerateObjectsInArea : MonoBehaviour
             Random.Range(-extents.z, extents.z) + center.z
         );
     }
-    
+
+    private Vector3 GetDeterministicRandomPositionInWorldBounds()
+    {
+        Vector3 extents = _bounds.extents;
+        Vector3 center = _bounds.center;
+        return new Vector3(
+            rGenerator.Next((int)-extents.x, (int)extents.x) + center.x,
+            rGenerator.Next((int)-extents.y, (int)extents.y) + center.y,
+            rGenerator.Next((int)-extents.z, (int)extents.z) + center.z
+        );
+    }
+
     /// <summary>
     /// Gets a random rotation (Quaternion) using the randomRotationMinimal and randomRotationMaximal.
     /// </summary>
@@ -86,5 +100,12 @@ public class GenerateObjectsInArea : MonoBehaviour
         return Quaternion.Euler(Random.Range(randomRotationMinimal.x, randomRotationMaximal.x),
             Random.Range(randomRotationMinimal.y, randomRotationMaximal.y),
             Random.Range(randomRotationMinimal.z, randomRotationMaximal.z));
+    }
+
+    private Quaternion GetDeterministicRandomRotation()
+    {
+        return Quaternion.Euler(rGenerator.Next((int)randomRotationMinimal.x, (int)randomRotationMaximal.x),
+            rGenerator.Next((int)randomRotationMinimal.y, (int)randomRotationMaximal.y),
+            rGenerator.Next((int)randomRotationMinimal.z, (int)randomRotationMaximal.z));
     }
 }

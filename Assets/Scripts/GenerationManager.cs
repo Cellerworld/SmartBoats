@@ -58,7 +58,6 @@ public class GenerationManager : MonoBehaviour
     private PirateLogic[] _pirateParents;
 
     DataCollector dataCollector = new DataCollector();
-
     [SerializeField]
     string fileName = "/test.txt";
 
@@ -78,8 +77,11 @@ public class GenerationManager : MonoBehaviour
             if (simulationCount >= simulationTimer)
             {
                 ++generationCount;
-                if (generationCount == 5)
+                if (generationCount == 10)
+                {
                     dataCollector.writeFile(Application.dataPath + "/Data" + fileName);
+                    Debug.Log("Finished test");
+                }
                 MakeNewGeneration();
                 simulationCount = -Time.deltaTime;
             }
@@ -136,7 +138,7 @@ public class GenerationManager : MonoBehaviour
                 }
 
                 //pirate.Mutate(mutationFactor, mutationChance);
-                pirate.mutateNonUniform(generationCount);
+                pirate.muultiNonUniformMutation(generationCount);
                 pirate.AwakeUp();
                 i++;
             }
@@ -189,10 +191,11 @@ public class GenerationManager : MonoBehaviour
             GenerateBoats(_boatParents);
         }
         _boatParents = new BoatLogic[boatParentSize];
-        for (int i = 0; i < boatParentSize; i++)
-        {
-            _boatParents[i] = _activeBoats[i];
-        }
+        if (_activeBoats.Count >= boatParentSize)
+            for (int i = 0; i < boatParentSize; i++)
+            {
+                _boatParents[i] = _activeBoats[i];
+            }
 
         BoatLogic lastBoatWinner = _activeBoats[0];
         lastBoatWinner.name += "Gen-" + generationCount;
