@@ -256,7 +256,7 @@ public class AgentLogic : MonoBehaviour, IComparable
 
         rayRadius = (int)applyNonUnifromMutation(rayRadius, 360, _minimalRayRadius, pGeneration);
 
-        float newSight = applyNonUnifromMutation(sight, 100, _minimalSight, pGeneration);
+        float newSight = applyNonUnifromMutation(sight, 60, _minimalSight, pGeneration);
         //maybe change this
         if (newSight - sight > 0)
         {
@@ -265,7 +265,7 @@ public class AgentLogic : MonoBehaviour, IComparable
         }
         sight = newSight;
 
-        float newMovingSpeed = applyNonUnifromMutation(sight, 100, _minimalSight, pGeneration);
+        float newMovingSpeed = applyNonUnifromMutation(sight, 60, _minimalSight, pGeneration);
         if (newMovingSpeed - movingSpeed > 0.0f)
         {
             sight -= (newMovingSpeed - movingSpeed) * _speedInfluenceInSight;
@@ -277,18 +277,18 @@ public class AgentLogic : MonoBehaviour, IComparable
         randomDirectionValue.y = applyNonUnifromMutation(randomDirectionValue.y, 10, -10, pGeneration);
 
 
-        boxWeight = applyNonUnifromMutation(boxWeight, 10, -10, pGeneration);
+        boxWeight = applyNonUnifromMutation(boxWeight, 5, -5, pGeneration);
 
-        distanceFactor = applyNonUnifromMutation(distanceFactor, 10, -10, pGeneration);
+        distanceFactor = applyNonUnifromMutation(distanceFactor, 5, -5, pGeneration);
 
 
-        boatWeight = applyNonUnifromMutation(boatWeight, 10, -10, pGeneration);
+        boatWeight = applyNonUnifromMutation(boatWeight, 5, -5, pGeneration);
 
-        boatDistanceFactor = applyNonUnifromMutation(boatDistanceFactor, 10, -10, pGeneration);
+        boatDistanceFactor = applyNonUnifromMutation(boatDistanceFactor, 5, -5, pGeneration);
 
-        enemyWeight = applyNonUnifromMutation(enemyWeight, 10, -10, pGeneration);
+        enemyWeight = applyNonUnifromMutation(enemyWeight, 5, -5, pGeneration);
 
-        enemyDistanceFactor = applyNonUnifromMutation(enemyDistanceFactor, 10, -10, pGeneration);
+        enemyDistanceFactor = applyNonUnifromMutation(enemyDistanceFactor, 5, -5, pGeneration);
     }
 
     private float applyNonUnifromMutation(float parameter, float max, float min, float generation)
@@ -306,7 +306,11 @@ public class AgentLogic : MonoBehaviour, IComparable
         else if (r1 >= 0.5f)
         {
             //xi -(ai + xi) * F(G)
-            parameter = parameter - ((min + parameter) * functionResult);
+            //if min is a minus value, we have a problem so we make another variant
+            if (min >= 0)
+                parameter = parameter - ((min + parameter) * functionResult);
+            else
+                parameter = parameter + ((min + parameter) * functionResult);
         }
 
         return parameter;
