@@ -116,7 +116,6 @@ public class AgentLogic : MonoBehaviour, IComparable
     [Space(10)]
     [SerializeField]
     static float shapeParameter = 2;
-    int maxGeneration = 500;
 
     [Space(10)]
     [Header("Debug & Help")]
@@ -299,14 +298,16 @@ public class AgentLogic : MonoBehaviour, IComparable
         float r2 = (float)r2Generator.NextDouble();// 1 - ((float)r2Generator.NextDouble() / 2);
 
         //F(G) = r2 (1- G/Gmax)^b
-        float functionResult = Mathf.Pow(r2 * (1.0f - (generation / 500.0f)), shapeParameter);
+        float functionResult = Mathf.Pow(r2 * (1.0f - (generation / GenerationManager.getMaxGeneration())), shapeParameter);
 
         if (r1 < 0.5f)
             //xi +(bi - xi) * F(G)
             parameter = parameter + ((max - parameter) * functionResult);
         else if (r1 >= 0.5f)
+        {
             //xi -(ai + xi) * F(G)
             parameter = parameter - ((min + parameter) * functionResult);
+        }
 
         return parameter;
     }

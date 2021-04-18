@@ -61,6 +61,12 @@ public class GenerationManager : MonoBehaviour
     [SerializeField]
     string fileName = "/test.txt";
 
+    private const float cMaxGeneration = 100;
+    public static float getMaxGeneration()
+    {
+        return cMaxGeneration;
+    }
+
     private void Start()
     {
         if (runOnStart)
@@ -77,7 +83,7 @@ public class GenerationManager : MonoBehaviour
             if (simulationCount >= simulationTimer)
             {
                 ++generationCount;
-                if (generationCount == 10)
+                if (generationCount == getMaxGeneration())
                 {
                     dataCollector.writeFile(Application.dataPath + "/Data" + fileName);
                     Debug.Log("Finished test");
