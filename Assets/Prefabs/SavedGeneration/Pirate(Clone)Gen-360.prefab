@@ -107,9 +107,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1516953657436090313}
-  m_LocalRotation: {x: -0, y: -0.12272338, z: -0, w: 0.99244094}
-  m_LocalPosition: {x: 0.30064014, y: 0.00000024687475, z: -4.2366543}
-  m_LocalScale: {x: 0.026049502, y: 0.026049502, z: 0.026049502}
+  m_LocalRotation: {x: -0, y: 0.4350707, z: -0, w: 0.90039635}
+  m_LocalPosition: {x: 4.778022, y: 0.000000017079385, z: 5.2113166}
+  m_LocalScale: {x: 0.0260495, y: 0.026049502, z: 0.0260495}
   m_Children:
   - {fileID: 715973413386029590}
   - {fileID: 1662845740659736635}
@@ -177,18 +177,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6ddd31faeafd45b797e3ac5dbe660d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  points: 10.700003
-  steps: 48
-  rayRadius: 359
-  sight: 99.94958
-  movingSpeed: 97.90412
-  randomDirectionValue: {x: 10, y: 10}
-  boxWeight: 9.999999
-  distanceFactor: 10
-  boatWeight: 10
-  boatDistanceFactor: 10
-  enemyWeight: 9.999999
-  enemyDistanceFactor: 10
+  points: 45.399998
+  steps: 1
+  rayRadius: 160
+  sight: 37.63034
+  movingSpeed: 37.666283
+  randomDirectionValue: {x: -0.65726954, y: -1.1784523}
+  boxWeight: -0.31974214
+  distanceFactor: 0.93874246
+  boatWeight: 1.4647893
+  boatDistanceFactor: 0.0061696437
+  enemyWeight: -0.6018845
+  enemyDistanceFactor: -1.0455115
   visionColor: {r: 0.053266272, g: 0.5943396, b: 0.08738161, a: 1}
   foundColor: {r: 0.59033465, g: 0.59780955, b: 0.6226415, a: 1}
   directionColor: {r: 0, g: 0, b: 0, a: 1}

@@ -61,7 +61,7 @@ public class GenerationManager : MonoBehaviour
     [SerializeField]
     string fileName = "/test.txt";
 
-    private const float cMaxGeneration = 100;
+    private const float cMaxGeneration = 500;
     public static float getMaxGeneration()
     {
         return cMaxGeneration;
@@ -71,6 +71,7 @@ public class GenerationManager : MonoBehaviour
     {
         if (runOnStart)
         {
+            Time.timeScale = 1.5f;
             StartSimulation();
         }
     }

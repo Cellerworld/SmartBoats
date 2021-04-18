@@ -115,7 +115,7 @@ public class AgentLogic : MonoBehaviour, IComparable
 
     [Space(10)]
     [SerializeField]
-    static float shapeParameter = 2;
+    static float shapeParameter = 3;
 
     [Space(10)]
     [Header("Debug & Help")]
@@ -310,7 +310,7 @@ public class AgentLogic : MonoBehaviour, IComparable
             if (min >= 0)
                 parameter = parameter - ((min + parameter) * functionResult);
             else
-                parameter = parameter + ((min + parameter) * functionResult);
+                parameter = parameter + ((min - parameter) * functionResult);
         }
 
         return parameter;
