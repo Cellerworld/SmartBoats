@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 public class GenerationManager : MonoBehaviour
@@ -61,7 +62,7 @@ public class GenerationManager : MonoBehaviour
     [SerializeField]
     string fileName = "/test.txt";
 
-    private const float cMaxGeneration = 500;
+    private const float cMaxGeneration = 1000;
     public static float getMaxGeneration()
     {
         return cMaxGeneration;
@@ -71,7 +72,6 @@ public class GenerationManager : MonoBehaviour
     {
         if (runOnStart)
         {
-            Time.timeScale = 1.5f;
             StartSimulation();
         }
     }

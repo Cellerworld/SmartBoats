@@ -115,7 +115,7 @@ public class AgentLogic : MonoBehaviour, IComparable
 
     [Space(10)]
     [SerializeField]
-    static float shapeParameter = 3;
+    static float shapeParameter = 0.5f;
 
     [Space(10)]
     [Header("Debug & Help")]
@@ -132,13 +132,17 @@ public class AgentLogic : MonoBehaviour, IComparable
     static System.Random r2Generator = new System.Random(2);
 
     #region Static Variables
-    private static float _minimalSteps = 1.0f;
-    private static float _minimalRayRadius = 1.0f;
-    private static float _minimalSight = 0.1f;
-    private static float _minimalMovingSpeed = 1.0f;
+    private static float _minimalSteps = 10.0f;
+    private static float _minimalRayRadius = 30.0f;
+    private static float _minimalSight = 5f;
+    private static float _minimalMovingSpeed = 10.0f;
     private static float _speedInfluenceInSight = 0.1250f;
     private static float _sightInfluenceInSpeed = 0.0625f;
     private static float _maxUtilityChoiceChance = 0.85f;
+
+    private static float _minWeightValue = -10;
+    private static float _maxWeightValue = 50;
+    private static float _maximalSteps = 100.0f;
     #endregion
 
     private void Awake()
@@ -252,12 +256,14 @@ public class AgentLogic : MonoBehaviour, IComparable
     public void muultiNonUniformMutation(int pGeneration)
     {
 
-        steps = (int)applyNonUnifromMutation(steps, 50, _minimalSteps, pGeneration);
+        steps = (int)applyNonUnifromMutation(steps, _maximalSteps, _minimalSteps, pGeneration);
+        steps = (int)Mathf.Clamp(steps, _minimalSteps, _maximalSteps);
 
         rayRadius = (int)applyNonUnifromMutation(rayRadius, 360, _minimalRayRadius, pGeneration);
+        rayRadius = (int)Mathf.Clamp(rayRadius, _minimalRayRadius, 360f);
 
-        float newSight = applyNonUnifromMutation(sight, 60, _minimalSight, pGeneration);
-        //maybe change this
+        float newSight = applyNonUnifromMutation(sight, 100, _minimalSight, pGeneration);
+
         if (newSight - sight > 0)
         {
             movingSpeed -= (newSight - sight) * _sightInfluenceInSpeed;
@@ -265,7 +271,7 @@ public class AgentLogic : MonoBehaviour, IComparable
         }
         sight = newSight;
 
-        float newMovingSpeed = applyNonUnifromMutation(sight, 60, _minimalSight, pGeneration);
+        float newMovingSpeed = applyNonUnifromMutation(sight, 100, _minimalSight, pGeneration);
         if (newMovingSpeed - movingSpeed > 0.0f)
         {
             sight -= (newMovingSpeed - movingSpeed) * _speedInfluenceInSight;
@@ -277,18 +283,18 @@ public class AgentLogic : MonoBehaviour, IComparable
         randomDirectionValue.y = applyNonUnifromMutation(randomDirectionValue.y, 10, -10, pGeneration);
 
 
-        boxWeight = applyNonUnifromMutation(boxWeight, 5, -5, pGeneration);
+        boxWeight = applyNonUnifromMutation(boxWeight, _maxWeightValue, _minWeightValue, pGeneration);
 
-        distanceFactor = applyNonUnifromMutation(distanceFactor, 5, -5, pGeneration);
+        distanceFactor = applyNonUnifromMutation(distanceFactor, _maxWeightValue, _minWeightValue, pGeneration);
 
 
-        boatWeight = applyNonUnifromMutation(boatWeight, 5, -5, pGeneration);
+        boatWeight = applyNonUnifromMutation(boatWeight, _maxWeightValue, _minWeightValue, pGeneration);
 
-        boatDistanceFactor = applyNonUnifromMutation(boatDistanceFactor, 5, -5, pGeneration);
+        boatDistanceFactor = applyNonUnifromMutation(boatDistanceFactor, _maxWeightValue, _minWeightValue, pGeneration);
 
-        enemyWeight = applyNonUnifromMutation(enemyWeight, 5, -5, pGeneration);
+        enemyWeight = applyNonUnifromMutation(enemyWeight, _maxWeightValue, _minWeightValue, pGeneration);
 
-        enemyDistanceFactor = applyNonUnifromMutation(enemyDistanceFactor, 5, -5, pGeneration);
+        enemyDistanceFactor = applyNonUnifromMutation(enemyDistanceFactor, _maxWeightValue, _minWeightValue, pGeneration);
     }
 
     private float applyNonUnifromMutation(float parameter, float max, float min, float generation)
